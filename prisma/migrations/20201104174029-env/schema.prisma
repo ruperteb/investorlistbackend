@@ -1,0 +1,59 @@
+// 1
+
+// datasource db {
+//  provider = "sqlite" 
+//  url = "***"
+//} 
+
+
+datasource db {
+  provider = "postgresql" 
+  url = "***"
+}
+
+// 2
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 3
+model Investor {
+  id          Int      @id @default(autoincrement())
+  investorName String
+  commercial Boolean @default(false)
+   industrial Boolean @default(false)
+   retail Boolean @default(false)
+   residential Boolean @default(false)
+   hotel Boolean @default(false)
+   contacts  Contact[] 
+   wc Boolean @default(false)  
+   gau Boolean @default(false)
+   kzn Boolean @default(false)
+   allregions Boolean @default(false)
+   minInvest Int @default(0)
+   maxInvest Int @default(100)
+    listed Boolean  @default(false)
+   unlisted Boolean @default(false)
+   private Boolean @default(false)
+   bee Boolean @default(false)
+   notes String @default("")
+}
+
+model Contact {
+   id Int      @id @default(autoincrement())
+  name String
+  position String
+  officeNo String
+  mobileNo String
+  email String
+  investorName Investor @relation(fields: [investorID], references: [id]) 
+  investorID Int
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  
+}

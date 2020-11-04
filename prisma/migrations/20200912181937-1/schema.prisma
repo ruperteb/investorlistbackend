@@ -1,0 +1,35 @@
+// 1
+datasource db {
+  provider = "sqlite" 
+  url = "***"
+}
+
+// 2
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 3
+model Investor {
+  id          Int      @id @default(autoincrement())
+  investorName String
+  commercial Boolean
+   industrial Boolean
+   retail Boolean
+   hotel Boolean
+   contacts  Contact[]
+   wc Boolean
+   gau Boolean
+   kzn Boolean
+   allregions Boolean
+}
+
+model Contact {
+   id Int      @id @default(autoincrement())
+  name String
+  officeNo String
+  mobileNo String
+  email String
+  investorName Investor @relation(fields: [investorID], references: [id]) 
+  investorID Int
+}
