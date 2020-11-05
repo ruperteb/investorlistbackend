@@ -62,6 +62,21 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  cors: {
+    credentials: true,
+    origin: (origin, callback) => {
+        const whitelist = [
+            "http://localhost:3000",
+            "https://localhost:3000"
+        ];
+
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by CORS"))
+        }
+    },
+
   context: request => {
     return {
       ...request,
@@ -87,7 +102,7 @@ const app = express();
 
 
 
-server.applyMiddleware({ app, cors: corsOptions,path:"/" });
+server.applyMiddleware({ app, /* cors: corsOptions, */path:"/" });
 
 const PORT = process.env.PORT || 4000;
  
