@@ -63,7 +63,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   cors: {
-    origin: '*',			// <- allow request from all domains
+    origin: 'http://localhost:3000/',			// <- allow request from all domains
     credentials: true},
   context: request => {
     return {
