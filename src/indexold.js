@@ -1,10 +1,7 @@
 const dotenv = require('dotenv')
 dotenv.config() // Load the environment variables
-/* const { GraphQLServer } = require('graphql-yoga') */
-const express = require('express');
-const { ApolloServer } = require('apollo-server');
+const { GraphQLServer } = require('graphql-yoga')
 const { PrismaClient } = require('@prisma/client')
-const typeDefs = require('./schema')
 
 // 1
 
@@ -20,11 +17,11 @@ const Subscription = require('./resolvers/Subscription')
 const Vote = require('./resolvers/Vote') */
 
 
-/* const { PubSub } = require('graphql-yoga') */
+const { PubSub } = require('graphql-yoga')
 
 const prisma = new PrismaClient()
 
-/* const pubsub = new PubSub() */
+const pubsub = new PubSub()
 
 
 
@@ -59,35 +56,28 @@ const resolvers = {
 }); */
 
 
-const server = new ApolloServer({
-  typeDefs,
+const server = new GraphQLServer({
+  typeDefs: './src/schema.graphql',
   resolvers,
   context: request => {
     return {
       ...request,
       prisma,
-     
+      pubsub
     }
   },
 })
 
-/* server.express.use(function(req, res, next) {
+server.express.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.header(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept'
   );
   next();
-}); */
+});
 
 
 
 
-/* server.start(opts, () => console.log(`Server is running on http://localhost:4000`)) */
-/* 
-const app = express();
-server.applyMiddleware({ app }); */
- 
-server.listen().then(({ url }) => {
-    console.log(`🚀  Server ready at ${url}`);
-  });
+server.start(/* opts, */ () => console.log(`Server is running on http://localhost:4000`))

@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-     "start": "node src/index.js"
+    "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^2.6.2",
+    "apollo-server": "^2.19.0",
+    "apollo-server-express": "^2.19.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "graphql-yoga": "^1.18.3",
@@ -21,4 +23,3 @@
     "@prisma/cli": "^2.6.2"
   }
 }
-
