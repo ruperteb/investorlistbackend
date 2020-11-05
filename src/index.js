@@ -83,12 +83,12 @@ const corsOptions = {
 /* server.start(opts, () => console.log(`Server is running on http://localhost:4000`)) */
 
 const app = express();
-app.use(cors())
+/* app.use(cors()) */
 
 
 
 
-server.applyMiddleware({ app, cors: corsOptions,path:"/" });
+server.applyMiddleware({ app, cors: {credentials: true, origin: true},path:"/" });
 
 const PORT = process.env.PORT || 4000;
  
