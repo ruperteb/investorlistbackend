@@ -75,8 +75,8 @@ const server = new ApolloServer({
         } else {
             callback(new Error("Not allowed by CORS"))
         }
-    },
-
+    }
+  },
   context: request => {
     return {
       ...request,
