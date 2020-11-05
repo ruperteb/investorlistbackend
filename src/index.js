@@ -42,7 +42,7 @@ const opts = {
   cors: {
     credentials: true,
     origin: ["http://localhost:3000/"], // your frontend url.
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,POST',
       preflightContinue: false,
       optionsSuccessStatus: 204
   }
