@@ -37,16 +37,14 @@ const resolvers = {
 
 // 3
 
-const opts = {
-  /* port: 4000, */
+/* const opts = {
+  port: 4000,
   cors: {
     credentials: true,
-    origin: ["http://localhost:3000/"], // your frontend url.
-    methods: 'GET,POST',
-      preflightContinue: false,
-      optionsSuccessStatus: 204
+    origin: ["http://localhost:3000/"], 
+   
   }
-};
+}; */
 
 /* server.express.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -69,4 +67,17 @@ const server = new GraphQLServer({
     }
   },
 })
-server.start(opts, () => console.log(`Server is running on http://localhost:4000`))
+
+server.express.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
+
+
+
+
+server.start(/* opts, */ () => console.log(`Server is running on http://localhost:4000`))
