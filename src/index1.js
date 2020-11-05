@@ -2,7 +2,7 @@ const dotenv = require('dotenv')
 dotenv.config() // Load the environment variables
 /* const { GraphQLServer } = require('graphql-yoga') */
 const express = require('express');
-const { ApolloServer } = require('apollo-server-express');
+const { ApolloServer } = require('apollo-server');
 const { PrismaClient } = require('@prisma/client')
 const typeDefs = require('./schema')
 
@@ -62,6 +62,10 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  cors: false
+  /* {
+    origin: 'http://localhost:3000/',		
+    credentials: true} */,
   context: request => {
     return {
       ...request,
@@ -84,10 +88,10 @@ const server = new ApolloServer({
 
 
 /* server.start(opts, () => console.log(`Server is running on http://localhost:4000`)) */
-
+/* 
 const app = express();
-server.applyMiddleware({ app });
+server.applyMiddleware({ app }); */
  
-app.listen({ port: 4000 }, () =>
-  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
-);
+server.listen().then(({ url }) => {
+    console.log(`🚀  Server ready at ${url}`);
+  });
