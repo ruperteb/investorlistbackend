@@ -22,5 +22,8 @@
   },
   "devDependencies": {
     "@prisma/cli": "^2.6.2"
+  },
+  "engines": {
+    "node": "12.14.0"
   }
 }
