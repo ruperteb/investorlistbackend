@@ -3,7 +3,8 @@ const { gql } = require("apollo-server-express");
 const typeDefs = gql`
 type Query {
   
-    investors: [Investor]
+    investors: [Investor],
+    contacts: [Contact]
 }
 
 type Mutation {
@@ -66,12 +67,12 @@ contactId: Int,
  deleteInvestor (investorId: Int): Investor!
 
  postContact (
-   name: String
-   position: String
- officeNo: String
- mobileNo: String
- email: String
- investorID: ID
+  contactName: String = "",
+  contactPosition: String = "",
+  contactOfficeNo: String = "",
+ contactMobileNo: String = "",
+ contactEmail: String = "",
+ investorID: Int
  ): Contact!
 
   login (email: String!, password: String!): AuthPayload

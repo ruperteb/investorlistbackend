@@ -5,7 +5,13 @@
     
   }
 
+  async function contacts(parent, args, context, info) {
+    return context.prisma.contact.findMany()
+    
+  }
+
   module.exports = {
     investors,
+    contacts,
    
   }

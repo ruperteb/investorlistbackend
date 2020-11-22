@@ -161,10 +161,11 @@ function postContact(parent, args, context, info) {
 
 
     data: {
-      name: args.name,
-      officeNo: args.officeNo,
-      mobileNo: args.mobileNo,
-      email: args.email,
+      name: args.contactName,
+      position: args.contactPosition,
+      officeNo: args.contactOfficeNo,
+      mobileNo: args.contactMobileNo,
+      email: args.contactEmail,
 
       investorName: { connect: { id: investorId } },
     }
