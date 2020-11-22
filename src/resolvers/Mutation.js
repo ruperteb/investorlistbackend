@@ -20,10 +20,10 @@ async function postInvestor(parent, args, context, info) {
       minInvest: args.minInvest,
       maxInvest: args.maxInvest,
       listed: args.listed,
-   unlisted: args.unlisted,
-   private: args.private,
-   bee: args.bee,
-   notes: args.notes,
+      unlisted: args.unlisted,
+      private: args.private,
+      bee: args.bee,
+      notes: args.notes,
 
     }
   })
@@ -71,44 +71,62 @@ async function updateInvestor(parent, args, context, info) {
       minInvest: args.minInvest,
       maxInvest: args.maxInvest,
       listed: args.listed,
-   unlisted: args.unlisted,
-   private: args.private,
-   bee: args.bee,
-   notes: args.notes,
-   contacts: {
-    update: [{
-      where: {
-        id: args.contactId
-      },
-      data: {
-        name: args.contactName,
-      position: args.contactPosition,
-      officeNo: args.contactOfficeNo,
-      mobileNo: args.contactMobileNo,
-      email: args.contactEmail,
+      unlisted: args.unlisted,
+      private: args.private,
+      bee: args.bee,
+      notes: args.notes,
+      contacts: {
+        update: [{
+          where: {
+            id: args.contactId
+          },
+          data: {
+            name: args.contactName,
+            position: args.contactPosition,
+            officeNo: args.contactOfficeNo,
+            mobileNo: args.contactMobileNo,
+            email: args.contactEmail,
+          }
+        }]
       }
-    }]
-     }
 
     }
   })
-  
-  
+
+
 
 
   return updatedInvestor
 
 }
 
-async function deleteInvestor(parent, args, context, info) {
-  const investor =  await context.prisma.investor.findOne({
+async function setPrimaryContact(parent, args, context, info) {
+  /* const userId = getUserId(context) */
+
+  const investor = await context.prisma.investor.findOne({
     where: {
-      id: args.investorId,
-      
+      id: args.investorID,
+
     },
     select: {
-      id:true,
-      investorName:true,
+      id: true,
+      investorName: true,
+      commercial: true,
+      industrial: true,
+      residential: true,
+      retail: true,
+      hotel: true,
+      wc: true,
+      gau: true,
+      kzn: true,
+      allregions: true,
+      minInvest: true,
+      maxInvest: true,
+      listed: true,
+      unlisted: true,
+      private: true,
+      bee: true,
+      notes: true,
       contacts: {
         include: {
           investorName: true,
@@ -118,24 +136,100 @@ async function deleteInvestor(parent, args, context, info) {
   })
 
   console.log(investor)
-  const delArray =[]
- const delMap = await investor.contacts.map((contact,index) => {
-console.log(contact.id)
-delArray[index] = {id: contact.id}
+  var contactsArray = []
+  var selectedContact = investor.contacts.filter(t => {
+    if (t)
+      return (t.id === args.contactID)
+  })
+  var otherContacts = investor.contacts.filter(t => {
+    if (t)
+      return (t.id !== args.contactID)
+  })
 
 
+  contactsArray = [...selectedContact, ...otherContacts]
+  const contactsArrayCleaned = contactsArray.map(contact => {
+    let formattedContact = {
+      name: contact.name,
+      position: contact.position,
+      email: contact.email,
+      officeNo: contact.officeNo,
+      mobileNo: contact.mobileNo
+    }
+    return formattedContact
 
-   
- })
- console.log(delArray)
- const contactDel = await context.prisma.investor.update({
-  where: { id: args.investorId },
-  data: {
-    contacts: {
-      delete: delArray,
+  })
+  console.log(contactsArrayCleaned, "log")
+
+  console.log(investor)
+  const delArray = []
+  const delMap = await investor.contacts.map((contact, index) => {
+    console.log(contact.id)
+    delArray[index] = { id: contact.id }
+  })
+
+  console.log(delArray)
+  const contactDel = await context.prisma.investor.update({
+    where: { id: args.investorID },
+    data: {
+      contacts: {
+        delete: delArray,
+      },
     },
-  },
-})
+  })
+
+  
+
+  const updatedInvestor = await context.prisma.investor.update({
+    where: { id: args.investorID },
+    data: {
+
+     
+
+      contacts: {
+        create: contactsArrayCleaned
+      }
+
+    }
+  })
+
+  return updatedInvestor
+
+}
+
+async function deleteInvestor(parent, args, context, info) {
+  const investor = await context.prisma.investor.findOne({
+    where: {
+      id: args.investorId,
+
+    },
+    select: {
+      id: true,
+      investorName: true,
+      contacts: {
+        include: {
+          investorName: true,
+        },
+      },
+    },
+  })
+
+  console.log(investor)
+  const delArray = []
+  const delMap = await investor.contacts.map((contact, index) => {
+    console.log(contact.id)
+    delArray[index] = { id: contact.id }
+  })
+
+  console.log(delArray)
+  const contactDel = await context.prisma.investor.update({
+    where: { id: args.investorId },
+    data: {
+      contacts: {
+        delete: delArray,
+      },
+    },
+  })
 
   /* const contactDel = await context.prisma.contact.delete({
     where: { investorID: args.investorId },
@@ -145,7 +239,7 @@ delArray[index] = {id: contact.id}
     where: { id: args.investorId },
   })
 
-  
+
 
   /* const userId = getUserId(context) */
   return investor
@@ -177,12 +271,12 @@ function postContact(parent, args, context, info) {
 
 async function deleteContact(parent, args, context, info) {
 
- /*  const contact =  await context.prisma.contact.findOne({
-    where: {
-      id: args.ContactID
-    },
-  }).investorName() */
-  
+  /*  const contact =  await context.prisma.contact.findOne({
+     where: {
+       id: args.ContactID
+     },
+   }).investorName() */
+
 
   const contactDel = await context.prisma.contact.delete({
     where: { id: args.contactID },
@@ -216,7 +310,7 @@ async function login(parent, args, context, info) {
 async function signup(parent, args, context, info) {
   // 1
   const password = await bcrypt.hash(args.password, 10)
-  
+
   // 2
   const user = await context.prisma.user.create({ data: { ...args, password } })
 
@@ -241,6 +335,7 @@ module.exports = {
   deleteInvestor,
   deleteContact,
   updateInvestor,
+  setPrimaryContact,
   login,
   signup,
 }

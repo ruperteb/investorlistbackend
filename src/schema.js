@@ -77,6 +77,8 @@ contactId: Int,
 
  deleteContact (contactID: Int): Contact!
 
+ setPrimaryContact (investorID: Int, contactID: Int): Investor!
+
   login (email: String!, password: String!): AuthPayload
 
    signup(email: String!, password: String!, name: String!): AuthPayload
