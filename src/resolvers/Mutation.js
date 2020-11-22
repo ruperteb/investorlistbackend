@@ -175,6 +175,22 @@ function postContact(parent, args, context, info) {
   return newContact
 }
 
+async function deleteContact(parent, args, context, info) {
+
+ /*  const contact =  await context.prisma.contact.findOne({
+    where: {
+      id: args.ContactID
+    },
+  }).investorName() */
+  
+
+  const contactDel = await context.prisma.contact.delete({
+    where: { id: args.contactID },
+  })
+  /* const userId = getUserId(context) */
+  return contactDel
+}
+
 async function login(parent, args, context, info) {
   // 1
   const user = await context.prisma.user.findOne({ where: { email: args.email } })
@@ -223,6 +239,7 @@ module.exports = {
   postInvestor,
   postContact,
   deleteInvestor,
+  deleteContact,
   updateInvestor,
   login,
   signup,
