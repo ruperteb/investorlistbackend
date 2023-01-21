@@ -1,5 +1,5 @@
 function contacts (parent, args, context) {
-    return context.prisma.investor.findOne({ where: { id: parent.id } }).contacts()
+    return context.prisma.investor.findUnique({ where: { id: parent.id } }).contacts()
   }
 
   

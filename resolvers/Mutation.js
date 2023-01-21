@@ -1,6 +1,9 @@
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const { APP_SECRET, getUserId } = require('../utils')
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { PrismaClient } = require("@prisma/client");
+const { APP_SECRET, getUserId } = require("../utils");
+
+const prisma = new PrismaClient();
 
 async function postInvestor(parent, args, context, info) {
   /* const userId = getUserId(context) */
@@ -24,15 +27,10 @@ async function postInvestor(parent, args, context, info) {
       private: args.private,
       bee: args.bee,
       notes: args.notes,
-
-    }
-  })
-  /*  context.pubsub.publish("NEW_LINK", newLink) */
-  console.log(newInvestor.id)
+    },
+  });
 
   const newContact = await context.prisma.contact.create({
-
-
     data: {
       name: args.contactName,
       position: args.contactPosition,
@@ -41,20 +39,15 @@ async function postInvestor(parent, args, context, info) {
       email: args.contactEmail,
 
       investorName: { connect: { id: newInvestor.id } },
-    }
-  })
-  /*  context.pubsub.publish("NEW_LINK", newLink) */
+    },
+  });
 
-  return newContact
+  return newContact;
 
-
-  return newInvestor
-
+  /* return newInvestor; */
 }
 
 async function updateInvestor(parent, args, context, info) {
-  /* const userId = getUserId(context) */
-
   const updatedInvestor = await context.prisma.investor.update({
     where: { id: args.investorId },
     data: {
@@ -76,37 +69,31 @@ async function updateInvestor(parent, args, context, info) {
       bee: args.bee,
       notes: args.notes,
       contacts: {
-        update: [{
-          where: {
-            id: args.contactId
+        update: [
+          {
+            where: {
+              id: args.contactId,
+            },
+            data: {
+              name: args.contactName,
+              position: args.contactPosition,
+              officeNo: args.contactOfficeNo,
+              mobileNo: args.contactMobileNo,
+              email: args.contactEmail,
+            },
           },
-          data: {
-            name: args.contactName,
-            position: args.contactPosition,
-            officeNo: args.contactOfficeNo,
-            mobileNo: args.contactMobileNo,
-            email: args.contactEmail,
-          }
-        }]
-      }
+        ],
+      },
+    },
+  });
 
-    }
-  })
-
-
-
-
-  return updatedInvestor
-
+  return updatedInvestor;
 }
 
 async function setPrimaryContact(parent, args, context, info) {
-  /* const userId = getUserId(context) */
-
-  const investor = await context.prisma.investor.findOne({
+  const investor = await context.prisma.investor.findUnique({
     where: {
       id: args.investorID,
-
     },
     select: {
       id: true,
@@ -133,42 +120,33 @@ async function setPrimaryContact(parent, args, context, info) {
         },
       },
     },
-  })
+  });
 
-  console.log(investor)
-  var contactsArray = []
-  var selectedContact = investor.contacts.filter(t => {
-    if (t)
-      return (t.id === args.contactID)
-  })
-  var otherContacts = investor.contacts.filter(t => {
-    if (t)
-      return (t.id !== args.contactID)
-  })
+  var contactsArray = [];
+  var selectedContact = investor.contacts.filter((t) => {
+    if (t) return t.id === args.contactID;
+  });
+  var otherContacts = investor.contacts.filter((t) => {
+    if (t) return t.id !== args.contactID;
+  });
 
-
-  contactsArray = [...selectedContact, ...otherContacts]
-  const contactsArrayCleaned = contactsArray.map(contact => {
+  contactsArray = [...selectedContact, ...otherContacts];
+  const contactsArrayCleaned = contactsArray.map((contact) => {
     let formattedContact = {
       name: contact.name,
       position: contact.position,
       email: contact.email,
       officeNo: contact.officeNo,
-      mobileNo: contact.mobileNo
-    }
-    return formattedContact
+      mobileNo: contact.mobileNo,
+    };
+    return formattedContact;
+  });
 
-  })
-  console.log(contactsArrayCleaned, "log")
-
-  console.log(investor)
-  const delArray = []
+  const delArray = [];
   const delMap = await investor.contacts.map((contact, index) => {
-    console.log(contact.id)
-    delArray[index] = { id: contact.id }
-  })
+    delArray[index] = { id: contact.id };
+  });
 
-  console.log(delArray)
   const contactDel = await context.prisma.investor.update({
     where: { id: args.investorID },
     data: {
@@ -176,32 +154,24 @@ async function setPrimaryContact(parent, args, context, info) {
         delete: delArray,
       },
     },
-  })
-
-  
+  });
 
   const updatedInvestor = await context.prisma.investor.update({
     where: { id: args.investorID },
     data: {
-
-     
-
       contacts: {
-        create: contactsArrayCleaned
-      }
+        create: contactsArrayCleaned,
+      },
+    },
+  });
 
-    }
-  })
-
-  return updatedInvestor
-
+  return updatedInvestor;
 }
 
 async function deleteInvestor(parent, args, context, info) {
-  const investor = await context.prisma.investor.findOne({
+  const investor = await context.prisma.investor.findUnique({
     where: {
       id: args.investorId,
-
     },
     select: {
       id: true,
@@ -212,16 +182,13 @@ async function deleteInvestor(parent, args, context, info) {
         },
       },
     },
-  })
+  });
 
-  console.log(investor)
-  const delArray = []
+  const delArray = [];
   const delMap = await investor.contacts.map((contact, index) => {
-    console.log(contact.id)
-    delArray[index] = { id: contact.id }
-  })
+    delArray[index] = { id: contact.id };
+  });
 
-  console.log(delArray)
   const contactDel = await context.prisma.investor.update({
     where: { id: args.investorId },
     data: {
@@ -229,31 +196,19 @@ async function deleteInvestor(parent, args, context, info) {
         delete: delArray,
       },
     },
-  })
-
-  /* const contactDel = await context.prisma.contact.delete({
-    where: { investorID: args.investorId },
-  }) */
+  });
 
   const investorDel = await context.prisma.investor.delete({
     where: { id: args.investorId },
-  })
+  });
 
-
-
-  /* const userId = getUserId(context) */
-  return investor
+  return investor;
 }
 
-
 function postContact(parent, args, context, info) {
-  /* const userId = getUserId(context) */
-
-  const investorId = args.investorID
+  const investorId = args.investorID;
 
   const newContact = context.prisma.contact.create({
-
-
     data: {
       name: args.contactName,
       position: args.contactPosition,
@@ -262,74 +217,57 @@ function postContact(parent, args, context, info) {
       email: args.contactEmail,
 
       investorName: { connect: { id: investorId } },
-    }
-  })
-  /*  context.pubsub.publish("NEW_LINK", newLink) */
+    },
+  });
 
-  return newContact
+  return newContact;
 }
 
 async function deleteContact(parent, args, context, info) {
-
-  /*  const contact =  await context.prisma.contact.findOne({
-     where: {
-       id: args.ContactID
-     },
-   }).investorName() */
-
-
   const contactDel = await context.prisma.contact.delete({
     where: { id: args.contactID },
-  })
-  /* const userId = getUserId(context) */
-  return contactDel
+  });
+
+  return contactDel;
 }
 
 async function login(parent, args, context, info) {
-  // 1
-  const user = await context.prisma.user.findOne({ where: { email: args.email } })
+  const user = await context.prisma.user.findUnique({
+    where: { email: args.email },
+  });
   if (!user) {
-    throw new Error('No such user found')
+    throw new Error("No such user found");
   }
 
-  // 2
-  const valid = await bcrypt.compare(args.password, user.password)
+  const valid = await bcrypt.compare(args.password, user.password);
   if (!valid) {
-    throw new Error('Invalid password')
+    throw new Error("Invalid password");
   }
 
-  const token = jwt.sign({ userId: user.id }, APP_SECRET)
+  const token = jwt.sign({ userId: user.id }, APP_SECRET);
 
-  // 3
   return {
     token,
     user,
-  }
+  };
 }
 
 async function signup(parent, args, context, info) {
-  // 1
-  const password = await bcrypt.hash(args.password, 10)
+  const password = await bcrypt.hash(args.password, 10);
 
-  // 2
-  const user = await context.prisma.user.create({ data: { ...args, password } })
+  const user = await context.prisma.user.create({
+    data: { ...args, password },
+  });
 
-  // 3
-  const token = jwt.sign({ userId: user.id }, APP_SECRET)
+  const token = jwt.sign({ userId: user.id }, APP_SECRET);
 
-  // 4
   return {
     token,
     user,
-  }
+  };
 }
 
-
-
-
-
 module.exports = {
-
   postInvestor,
   postContact,
   deleteInvestor,
@@ -338,4 +276,4 @@ module.exports = {
   setPrimaryContact,
   login,
   signup,
-}
+};
